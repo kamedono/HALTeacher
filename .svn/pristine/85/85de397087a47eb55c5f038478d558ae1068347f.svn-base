@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="7701" systemVersion="14F27" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="Clicker" representedClassName="HALTeacher.Clicker" syncable="YES">
+        <attribute name="id" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="cource" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Cource" inverseName="clicker" inverseEntity="Cource" syncable="YES"/>
+    </entity>
+    <entity name="Cource" representedClassName="HALTeacher.Cource" syncable="YES">
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="number" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="clicker" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Clicker" inverseName="cource" inverseEntity="Clicker" syncable="YES"/>
+        <relationship name="courceStudent" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CourceStudent" inverseName="cource" inverseEntity="CourceStudent" syncable="YES"/>
+        <relationship name="quiz" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Quiz" inverseName="cource" inverseEntity="Quiz" syncable="YES"/>
+    </entity>
+    <entity name="CourceStudent" representedClassName="HALTeacher.CourceStudent" syncable="YES">
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="cource" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Cource" inverseName="courceStudent" inverseEntity="Cource" syncable="YES"/>
+    </entity>
+    <entity name="Question" representedClassName="HALTeacher.Question" syncable="YES">
+        <attribute name="answer" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="judge" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="q_id" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <relationship name="student" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Student" inverseName="question" inverseEntity="Student" syncable="YES"/>
+    </entity>
+    <entity name="Quiz" representedClassName="HALTeacher.Quiz" syncable="YES">
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="cource" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Cource" inverseName="quiz" inverseEntity="Cource" syncable="YES"/>
+    </entity>
+    <entity name="Student" representedClassName="HALTeacher.Student" syncable="YES">
+        <attribute name="id" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="score" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <relationship name="question" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Question" inverseName="student" inverseEntity="Question" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="Cource" positionX="-369" positionY="-279" width="128" height="133"/>
+        <element name="CourceStudent" positionX="-119" positionY="-342" width="128" height="73"/>
+        <element name="Question" positionX="-56" positionY="77" width="128" height="103"/>
+        <element name="Quiz" positionX="-119" positionY="-241" width="128" height="88"/>
+        <element name="Student" positionX="-344" positionY="77" width="128" height="103"/>
+        <element name="Clicker" positionX="-137" positionY="-135" width="128" height="103"/>
+    </elements>
+</model>

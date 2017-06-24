@@ -1,0 +1,148 @@
+//
+//  FinishTimerViewController.swift
+//  HALTeacher
+//
+//  Created by マイコン部 on 2015/09/12.
+//  Copyright (c) 2015年 sotuken. All rights reserved.
+//
+
+import UIKit
+
+class FinishViewController: UIViewController, RightViewControllerDelegate {
+    
+    @IBOutlet weak var timerView: TimerView!
+    
+    // 終了するリスト
+    enum FinishList {
+        case timer
+        case content
+    }
+    
+    @IBAction func timerFinishButton(sender: UIButton) {
+        self.createMoodleAccessAlertView("タイマー", finish: .timer)
+    }
+    
+    @IBAction func testFinishButton(sender: UIButton) {
+        self.createMoodleAccessAlertView("小テスト", finish: .content)
+    }
+    
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        Timer.timerInstance.delegate = self.timerView
+
+        var appDelegate: AppDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
+        appDelegate.rightViewController?.delegate = self
+
+    }
+    
+    
+    
+    /**
+    確認alertの表示
+    */
+    func createMoodleAccessAlertView(title: String, finish: FinishList) {
+        dispatch_async(dispatch_get_main_queue(), {
+            // AlertController作成
+            var checkAlertView = UIAlertController(title: title + "を終了します", message: "よろしいですか？", preferredStyle: .Alert)
+            
+            // OKボタンを押した時
+            var okAction = UIAlertAction(title: "OK", style: UIAlertActionStyle.Default) {
+                UIAlertAction in
+                switch(finish) {
+                    // タイマーを終了する処理
+                case .timer:
+                    self.timerFinish()
+                    
+                    // 小テストを終了する処理
+                case .content:
+                    //MoodleViewを見せる
+                    self.importMoodleAlertView()
+                }
+            }
+            
+            // Cancelボタンを押した時
+            var cancelAction = UIAlertAction(title: "キャンセル", style: UIAlertActionStyle.Default) {
+                UIAlertAction in
+            }
+            // AlertControllerにActionを追加させる
+            checkAlertView.addAction(okAction)
+            checkAlertView.addAction(cancelAction)
+            
+            //Viewを見せる
+            self.presentViewController(checkAlertView, animated: true, completion: nil)
+        })
+    }
+    
+    /**
+    Moodle成績登録のAlertView
+    */
+    func importMoodleAlertView(){
+        dispatch_async(dispatch_get_main_queue(), {
+            // AlertController作成
+            var checkAlertView = UIAlertController(title: "Moodle成績登録", message: "小テストの結果を\nMoodleに登録しますか?", preferredStyle: .Alert)
+            
+            // OKボタンを押した時
+            var okAction = UIAlertAction(title: "登録", style: UIAlertActionStyle.Default) {
+                UIAlertAction in
+                var importMoodleScore = ImportMoodleScore()
+                var token = "bf12551cc0886e3f4a9c7729ede4de9a"
+                //                let token = MoodleInfo.moodleInfoInstance.tokenID
+                
+                for(var i=0; i<StudentInfoBox.studentInfoBoxInstance.studentList.count; i++){
+                    //学生の情報
+                    let studentInfo = StudentInfoBox.studentInfoBoxInstance.studentList[i]
+                    //コースのID
+                    let courseID = MoodleInfo.moodleInfoInstance.selectCource.courceNumber.toInt()
+                    //点数
+                    let score = QuestionAnswerBox.questionAnswerBoxInstance.studentsAnswer[studentInfo.UUID!]!.getScore()
+                    //小テストの名前
+                    let quizName = QuestionBox.questionBoxInstance.selectQuestion[i].name
+                    //成績登録の実行
+                    importMoodleScore.uploadQuizScore(token, courseID: courseID!, studentID: studentInfo.number.toInt()!, quizName: quizName, grade: score)
+                }
+                println("成績登録完了")
+                self.contentFinish()
+            }
+            
+            // Cancelボタンを押した時
+            var cancelAction = UIAlertAction(title: "キャンセル", style: UIAlertActionStyle.Default) {
+                UIAlertAction in
+                self.contentFinish()
+            }
+            // AlertControllerにActionを追加させる
+            checkAlertView.addAction(okAction)
+            checkAlertView.addAction(cancelAction)
+            
+            //Viewを見せる
+            self.presentViewController(checkAlertView, animated: true, completion: nil)
+        })
+    }
+    
+    /**
+    タイマーの終了処理
+    */
+    func timerFinish() {
+        Timer.timerInstance.timerCount = 0
+        Timer.timerInstance.timeCountDown = 0
+    }
+    
+    /**
+    小テストの終了処理
+    */
+    func contentFinish() {
+        CoreCentralManager.coreCentralInstance.sendWritingRequest(CoreCentralManager.coreCentralInstance.quizFinishUUID, sendData: "quizFinish")
+        self.performSegueWithIdentifier("goTopTableViewSegue", sender: nil)
+        BGMManager.bgmManagerInstance.stopMusic()
+    }
+    
+    /**
+    コンテンツ終了のデリゲート
+    */
+    func goTopTableViewSegue() {
+        self.performSegueWithIdentifier("goTopTableViewSegue", sender: nil)
+    }
+}
